@@ -2,7 +2,9 @@
 
 **Use one default Git identity and different names/emails per folder.** No switching—Git picks the right identity by repo path (e.g. personal everywhere, work email in `~/work`).
 
-**Live site:** [ashishcumar.github.io/git-multiple-identities](https://ashishcumar.github.io/git-multiple-identities) · **Deploy:** [DEPLOY.md](DEPLOY.md)
+[![Website screenshot](assets/screenshot.png)](https://ashishcumar.github.io/git-multiple-identities)
+
+**→ [Open the website](https://ashishcumar.github.io/git-multiple-identities)** (docs, quick start, and more) · **Deploy:** [DEPLOY.md](DEPLOY.md)
 
 ---
 
