@@ -1,6 +1,18 @@
-# git-multiple-identities
+# Git Multiple Identities
 
-Use **one global Git identity** and **multiple path-specific identities** — e.g. personal as default, office for `~/work`, client-A for `~/clients/client-a`. No manual switching; Git picks identity by repo path.
+**Use one default Git identity and different names/emails per folder.** No switching—Git picks the right identity by repo path (e.g. personal everywhere, work email in `~/work`).
+
+---
+
+## Contents
+
+- [Quick start](#quick-start)
+- [How it works](#how-it-works)
+- [Verify](#verify)
+- [Pushing to GitHub](#pushing-to-github)
+- [Requirements](#requirements)
+
+---
 
 ## Quick start
 
@@ -10,63 +22,72 @@ cd git-multiple-identities
 ./setup.sh
 ```
 
-You’ll be asked for:
+During setup you enter:
 
-1. **Global default** — name and email used in any repo that doesn’t match a path below.
-2. **Path-specific identities** — for each: a label (e.g. `office`, `client-a`), folder path, name, and email. Add as many as you need; answer `n` when done.
+1. **Default identity** — name and email for repos that don’t match any path.
+2. **Path identities** — label, folder path, name, and email for each (e.g. “work”, `~/work`, Work Name, work@company.com). Add as many as you need, then answer `n` when done.
 
-Your existing `~/.gitconfig` is backed up with a timestamp before any changes.
+Your current `~/.gitconfig` is backed up automatically before any changes.
+
+---
 
 ## How it works
 
-- **Default identity** is stored in `~/.gitconfig` under `[user]`.
-- For each path-specific identity, the script creates `~/.gitconfig-<label>` and adds an `includeIf "gitdir:<path>/"` in `~/.gitconfig` that loads that file for repos **inside** that path.
-- Repos outside all configured paths use the global identity.
+- Your **default** name and email live in `~/.gitconfig`.
+- Each path identity gets a small config file (e.g. `~/.gitconfig-work`) and a conditional include in `~/.gitconfig`: “for repos under this path, use this identity.”
+- Any repo **outside** those paths uses the default identity.
 
-Paths should not overlap (or list more specific paths first). The **trailing slash** in paths is required and is added by the script.
+Use **non-overlapping paths** (or put more specific paths first). The script adds the needed trailing slash for you.
 
-## Publishing / pushing branches
-
-**Commit identity** (name/email) is chosen by path. **Push authentication** is separate:
-
-- **HTTPS** — Git uses your system or credential-helper credentials (e.g. one account per host). To push as different identities to the same host, use different remotes (e.g. different URLs or a credential helper that picks by repo path), or use SSH instead.
-- **SSH** — Use one SSH key per identity and point Git at the right key per repo or host. Example for a work key:
-  ```bash
-  # In a repo under your work path, or in ~/.ssh/config:
-  Host github.com-work
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/id_ed25519_work
-  ```
-  Then set the remote to `git@github.com-work:org/repo.git` for that repo.
-
-If "Publish Branch" fails, check: remote URL (`git remote -v`), that you’re logged in (HTTPS) or that the correct SSH key is used and added to the remote (e.g. GitHub/GitLab).
-
-### GitHub: "Your push would publish a private email address" (GH007)
-
-GitHub blocks pushes when the commit author email is one you’ve marked as **private** (so it won’t appear in public repo history). Fix it by either:
-
-- **Use GitHub’s noreply email** so your real email never appears:
-  ```bash
-  git config user.email "USERNAME@users.noreply.github.com"
-  ```
-  Then rewrite the last commit to use it: `git commit --amend --reset-author --no-edit`, and push again. Your exact noreply address is shown under [GitHub → Settings → Emails](https://github.com/settings/emails).
-- Or in [GitHub → Settings → Emails](https://github.com/settings/emails), make the email public or disable “Block command line pushes that expose my email”.
+---
 
 ## Verify
 
-Inside a repo:
+In any repo, run:
 
 ```bash
 git config user.name && git config user.email
 ```
 
-You should see the identity for that path (or the global one if the repo isn’t under any configured path).
+You should see the identity for that path (or the default if the repo isn’t under a configured path).
+
+---
+
+## Pushing to GitHub
+
+**Commit author** (name/email) comes from this setup. **Who can push** is decided by how you sign in:
+
+| Method | Notes |
+|--------|--------|
+| **HTTPS** | One login per host. For different identities on the same host, use different remotes or SSH. |
+| **SSH** | Use one key per identity. In `~/.ssh/config` add a `Host` (e.g. `github.com-work`) with `IdentityFile` for that key, then use that host in the remote URL. |
+
+If push fails, check: `git remote -v`, and that you’re logged in (HTTPS) or using the right SSH key.
+
+### “Your push would publish a private email address” (GH007)
+
+GitHub blocks pushes when the commit email is **private** on your account. Fix it:
+
+**Option 1 — Use GitHub’s noreply email (recommended)**
+
+```bash
+git config user.email "USERNAME@users.noreply.github.com"
+git commit --amend --reset-author --no-edit
+git push --set-upstream origin main
+```
+
+Use your exact noreply address from [GitHub → Settings → Emails](https://github.com/settings/emails).
+
+**Option 2** — In [GitHub → Settings → Emails](https://github.com/settings/emails), make the email public or turn off “Block command line pushes that expose my email”.
+
+---
 
 ## Requirements
 
-- Git 2.13+ (for `includeIf`)
-- Bash (macOS / Linux)
+- **Git 2.13+** (for `includeIf`)
+- **Bash** (macOS or Linux)
+
+---
 
 ## License
 
