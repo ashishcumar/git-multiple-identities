@@ -25,6 +25,34 @@ Your existing `~/.gitconfig` is backed up with a timestamp before any changes.
 
 Paths should not overlap (or list more specific paths first). The **trailing slash** in paths is required and is added by the script.
 
+## Publishing / pushing branches
+
+**Commit identity** (name/email) is chosen by path. **Push authentication** is separate:
+
+- **HTTPS** — Git uses your system or credential-helper credentials (e.g. one account per host). To push as different identities to the same host, use different remotes (e.g. different URLs or a credential helper that picks by repo path), or use SSH instead.
+- **SSH** — Use one SSH key per identity and point Git at the right key per repo or host. Example for a work key:
+  ```bash
+  # In a repo under your work path, or in ~/.ssh/config:
+  Host github.com-work
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_work
+  ```
+  Then set the remote to `git@github.com-work:org/repo.git` for that repo.
+
+If "Publish Branch" fails, check: remote URL (`git remote -v`), that you’re logged in (HTTPS) or that the correct SSH key is used and added to the remote (e.g. GitHub/GitLab).
+
+### GitHub: "Your push would publish a private email address" (GH007)
+
+GitHub blocks pushes when the commit author email is one you’ve marked as **private** (so it won’t appear in public repo history). Fix it by either:
+
+- **Use GitHub’s noreply email** so your real email never appears:
+  ```bash
+  git config user.email "USERNAME@users.noreply.github.com"
+  ```
+  Then rewrite the last commit to use it: `git commit --amend --reset-author --no-edit`, and push again. Your exact noreply address is shown under [GitHub → Settings → Emails](https://github.com/settings/emails).
+- Or in [GitHub → Settings → Emails](https://github.com/settings/emails), make the email public or disable “Block command line pushes that expose my email”.
+
 ## Verify
 
 Inside a repo:
