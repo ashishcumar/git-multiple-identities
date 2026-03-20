@@ -123,17 +123,6 @@ Use your exact noreply address from [GitHub → Settings → Emails](https://git
 
 ---
 
-## Deploy the website
-
-The repo includes a ready-to-use site (`index.html` + `styles.css`). For maximum reachability:
-
-1. **GitHub Pages** — In repo **Settings** → **Pages**, set **Source** to **Deploy from a branch**, branch `main`, folder **/ (root)**. Your site will be at `https://ashishcumar.github.io/git-multiple-identities/`.
-2. **(Optional) js.org subdomain** — Get a short URL like `git-multiple-identities.js.org` by following [DEPLOY.md](DEPLOY.md).
-
-Full steps and a reachability checklist are in [DEPLOY.md](DEPLOY.md).
-
----
-
 ## License
 
 MIT
